@@ -1,0 +1,7 @@
+CFG ::= Rule*;
+Rule ::= NDecl Prod*;
+Prod ::= Symbol*;
+abstract Symbol;
+Terminal: Symbol ::= <TERMINAL>;
+NUse: Symbol ::= <ID>;
+NDecl ::= <ID>;

@@ -1,0 +1,120 @@
+options {
+  MULTI=true; 
+  VISITOR=true;
+  NODE_DEFAULT_VOID=true; 
+  NODE_PACKAGE="AST";
+  STATIC = false;
+}
+
+
+
+
+PARSER_BEGIN(CFGrammar)
+package AST;
+import java.util.*;
+import java.io.*;
+public class CFGrammar {
+  
+ 
+}
+PARSER_END(CFGrammar)
+
+
+
+
+SKIP : {
+  <(" " |"\t" |"\n" |"\r")+ >  // white-space
+|
+  <"<!" (~[">"])* ">" >        // comment
+}
+
+
+TOKEN [IGNORE_CASE]:
+{
+  <QUOTE : "\"">
+|
+  <PRODID : "::=">
+|
+  <SEMICOLON: ";" >
+}
+ 
+
+
+TOKEN :
+{
+  <ID: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z", "0"-"9"])* >
+|
+ <TERMINAL: "\"" (~[" " ,"\t" ,"\n" ,"\r"])+ "\"">  // quotedstring withoutwhite-space
+
+
+}
+
+
+
+CFG CFGrammar() #CFG : {}
+{
+  RuleList()
+  {return jjtThis;}
+}
+
+void RuleList() #List : {}
+{
+  (Rule())*
+}
+
+void Rule() #Rule: {}
+{
+ 
+   NDecl()
+   <PRODID>
+   (LOOKAHEAD(Symbol() | "|")ProdList() | ({} #List(0) {} #Prod(1) {} #List(1)))
+   <SEMICOLON>
+}
+
+
+
+
+void ProdList() #List : {}
+{
+  Prod() ( "|" Prod())*
+}
+
+void Prod() #Prod :{}
+{
+  SymbolList()
+}
+
+void SymbolList() #List : {}
+{
+  (Symbol())*
+}
+
+void Symbol() : {}
+{
+  Terminal() | NUse()
+}
+
+void Terminal() #Terminal : {Token t;}
+{
+   t = <TERMINAL> {jjtThis.setTERMINAL(t.image);}
+}
+
+void NUse() #NUse : {Token t;}
+{
+   t = <ID> {jjtThis.setID(t.image);}
+}
+
+
+
+
+void NDecl() #NDecl : {Token t;}
+{
+   t = <ID> {jjtThis.setID(t.image);}
+}
+
+
+
+
+
+
+

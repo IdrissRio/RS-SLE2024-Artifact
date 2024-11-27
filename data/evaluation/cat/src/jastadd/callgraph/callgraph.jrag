@@ -1,0 +1,466 @@
+/* Copyright (c) 2023, Idriss Riouak <idriss.riouak@cs.lth.se>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import org.extendj.callgraph.CallGraph;
+import org.extendj.callgraph.CallGraphNode;
+import java.util.LinkedHashSet;
+import org.extendj.Cat;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+aspect CallGraph {
+
+  /**
+   * Represents an entity that can be invoked or called.
+   */
+public
+  interface Invocable {
+  }
+
+  MethodAccess implements Invocable;
+  ClassInstanceExpr implements Invocable;
+  SuperConstructorAccess implements Invocable;
+
+  /**
+   * Represents a target that can be the subject of an invocation.
+   */
+public
+  interface InvocationTarget {
+  }
+
+  MethodDecl implements InvocationTarget;
+  ConstructorDecl implements InvocationTarget;
+  InstanceInitializer implements InvocationTarget;
+  StaticInitializer implements InvocationTarget;
+
+  coll Set<Invocable> InvocationTarget
+      .calledMethods()[new LinkedHashSet<>()] with add;
+  Invocable contributes this to InvocationTarget.calledMethods() for enclosingTarget();
+  // Collecting NTAs
+  ClassDecl contributes nta getImplicitConstructorOpt()
+      to InvocationTarget.calledMethods();
+  ConstructorDecl contributes nta getImplicitConstructorInvocation()
+      to ConstructorDecl.calledMethods();
+
+  syn CallGraph Program.callGraph() {
+    CallGraph g = new CallGraph();
+    InvocationTarget target = getTarget(entryPointPackage, entryPointMethod);
+    InvocationTarget caller = target.shouldBeConsiderAsMethod() ? target : null;
+    target.callGraphBuilder(g, new HashSet<>(), caller, true);
+    return g;
+  }
+
+  syn InvocationTarget Program.getTarget(String pkg, String name) {
+    String packageName =
+        pkg.contains(".") ? pkg.substring(0, pkg.lastIndexOf(".")) : "";
+
+    String className = pkg.substring(pkg.lastIndexOf(".") + 1);
+    TypeDecl td = lookupType(packageName, className);
+    Iterator iter = td.methods().iterator();
+    while (iter.hasNext()) {
+      MethodDecl md = (MethodDecl)iter.next();
+      if (md.name().equals(name)) {
+        return md;
+      }
+    }
+    throw new RuntimeException("CAT: Invocation Target not found. Check the " +
+                               "package and the name of the target.");
+  }
+
+  /**
+   * Inherited attribute that represents the nearest enclosing invocation target
+   * of an invocable entity.
+   *
+   * @return The nearest enclosing invocation target or null if none.
+   */
+  inh InvocationTarget Invocable.enclosingTarget();
+  eq InvocationTarget.getChild().enclosingTarget() = this;
+  eq Program.getChild().enclosingTarget() = null;
+
+  syn String InvocationTarget.returnType() = "";
+  eq MethodDecl.returnType() = type().name();
+
+  syn Map<String, String> InvocationTarget.paramTypes() = new LinkedHashMap<>();
+  eq MethodDecl.paramTypes() {
+    Map<String, String> paramTypes = new LinkedHashMap<>();
+    for (int i = 0; i < getNumParameter(); i++) {
+      TypeDecl paramType = getParameter(i).type();
+
+      paramTypes.put(getParameter(i).name(), paramType.name());
+    }
+    return paramTypes;
+  }
+
+public
+  boolean MethodDecl.isABridge = false;
+public
+  boolean ConstructorDecl.isABridge = false;
+public
+  boolean InstanceInitializer.isABridge = false;
+public
+  boolean StaticInitializer.isABridge = false;
+
+public
+  CallGraphNode MethodDecl.callGraphNode = null;
+public
+  CallGraphNode ConstructorDecl.callGraphNode = null;
+public
+  CallGraphNode InstanceInitializer.callGraphNode = null;
+public
+  CallGraphNode StaticInitializer.callGraphNode = null;
+
+public
+  void InvocationTarget.setIsABridge(boolean b) { isABridge = b; }
+
+public
+  CallGraphNode InvocationTarget.getCallGraphNode() { return callGraphNode; }
+
+public
+  void InvocationTarget.setCallGraphNode(CallGraphNode cgn) {
+    callGraphNode = cgn;
+  }
+  /**
+   * Builds a call graph based on invocation targets.
+   *
+   * @param g The call graph to populate.
+   * @param visited Set of visited invocation targets to prevent cycles.
+   * @param previous The previous invocation target in the call chain.
+   * @param first Indicates whether this is the first invocation in the call
+   * chain.
+   */
+public
+  void InvocationTarget.callGraphBuilder(
+      CallGraph g, Set<InvocationTarget> visited, InvocationTarget previous,
+      boolean first) {
+    if (!first && shouldBeConsiderAsMethod() && previous != null) {
+      addMethodCallToGraph(g, previous, this);
+    }
+    if (!visited.add(this)) {
+      return;
+    }
+    processCalledMethods(g, visited, previous);
+    processImplicitCalls(g, visited, previous);
+  }
+
+  /**
+   * Adds a method call to the call graph.
+   *
+   * @param g The call graph to add the method call to.
+   * @param caller The calling invocation target.
+   * @param callee The called invocation target.
+   */
+public
+  void InvocationTarget.addMethodCallToGraph(
+      CallGraph g, InvocationTarget caller, InvocationTarget callee) {
+    g.addMethodCall(caller.targetSignature(), caller.getKindOfAttribute(),
+                    callee.targetSignature(), callee.getKindOfAttribute(),
+                    caller, callee);
+  }
+
+  /**
+   * Processes the invocation targets of called methods.
+   *
+   * @param g The call graph to populate.
+   * @param visited Set of visited invocation targets to prevent cycles.
+   * @param previous The previous invocation target in the call chain.
+   */
+public
+  void InvocationTarget.processCalledMethods(
+      CallGraph g, Set<InvocationTarget> visited, InvocationTarget previous) {
+    for (Invocable method : calledMethods()) {
+      for (InvocationTarget decl : method.allDecls()) {
+        InvocationTarget caller = shouldBeConsiderAsMethod() ? this : previous;
+        decl.callGraphBuilder(g, visited, caller, false);
+      }
+    }
+  }
+
+  /**
+   * Processes the implicit invocation targets.
+   *
+   * @param g The call graph to populate.
+   * @param visited Set of visited invocation targets to prevent cycles.
+   * @param previous The previous invocation target in the call chain.
+   */
+public
+  void InvocationTarget.processImplicitCalls(
+      CallGraph g, Set<InvocationTarget> visited, InvocationTarget previous) {
+    for (InvocationTarget decl : implicitCalls()) {
+      InvocationTarget caller = shouldBeConsiderAsMethod() ? this : previous;
+      decl.callGraphBuilder(g, visited, caller, false);
+    }
+  }
+
+public
+  boolean Program.attributesOnly = false;
+
+public
+  String Program.entryPointPackage = "";
+public
+  String Program.entryPointMethod = "";
+
+public
+  boolean Program.mergeNames = false;
+
+  syn boolean InvocationTarget.shouldBeConsiderAsMethod() =
+      !program().attributesOnly;
+  eq MethodDecl.shouldBeConsiderAsMethod() =
+      (!program().attributesOnly || isAnAttribute()) && hasBlock();
+
+  /**
+   * Returns a set of implicit call targets for this invocation target.
+   *
+   * @return The set of implicit call targets.
+   */
+  syn Set<InvocationTarget> InvocationTarget.implicitCalls() = new HashSet<>();
+  eq ConstructorDecl.implicitCalls() {
+    Set<InvocationTarget> implicitCallTargets = new HashSet<>();
+    implicitCallTargets.addAll(
+        ((ClassDecl)hostType()).getInstanceInitailizer());
+    implicitCallTargets.addAll(((ClassDecl)hostType()).getStaticInitailizer());
+    return implicitCallTargets;
+  }
+
+  /*
+   * @return The signature of the invocation target.
+   */
+  syn String InvocationTarget.targetSignature() =
+      (program().mergeNames
+           ? ""
+           : hostType().packageName() + "." + hostType().name()) +
+      (program().mergeNames ? name() : fullSignature());
+  eq StaticInitializer.targetSignature() =
+      hostType().packageName() + "." + hostType().name() + "::clinit<>";
+  eq InstanceInitializer.targetSignature() =
+      hostType().packageName() + "." + hostType().name() + "::init<>";
+
+  /** Method signature, including type arguments.  */
+  syn String ConstructorDecl.fullSignature() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name() + "(");
+    for (int i = 0; i < getNumParameter(); i++) {
+      if (i != 0) {
+        sb.append(", ");
+      }
+      TypeDecl paramType = getParameter(i).type();
+      if (paramType instanceof PrimitiveType) {
+        sb.append(paramType.typeName());
+      } else {
+        sb.append(paramType.fullName());
+      }
+    }
+    sb.append(")");
+    return sb.toString();
+  }
+
+  /**
+   * Returns a set of all declarations of the invocable entity.
+   *
+   * @return A set containing all declarations of the invocable entity.
+   */
+  syn Set<InvocationTarget> Invocable.allDecls() =
+      Collections.<InvocationTarget>singleton(decl());
+  eq MethodAccess.allDecls() {
+    Set<InvocationTarget> decls = new HashSet<>();
+    decls.add(decl());
+    if (decl().isPrivate()) {
+      return decls;
+    }
+    MethodDecl targetDecl = decl();
+    TypeDecl host = targetDecl.hostType().getGenericHostDecl();
+    for (TypeDecl t : host.subtypes()) {
+      if (t instanceof ClassDecl || t instanceof InterfaceDecl) {
+        decls.addAll(
+            t.methods()
+                .stream()
+                .filter(md->(md.sameSignature(targetDecl) && md.hasBlock()))
+                .collect(Collectors.toList()));
+      }
+    }
+    return decls;
+  }
+
+  /**
+   * Indicates whether this body declaration is an instance initializer.
+   *
+   * @return True if this body declaration is an instance initializer, false
+   * otherwise.
+   */
+  syn boolean BodyDecl.isInstanceInitializer() = false;
+  eq InstanceInitializer.isInstanceInitializer() = true;
+
+  /**
+   * Indicates whether this instance initializer is an instance initializer.
+   *
+   * @return True, as this declaration is an instance initializer.
+   */
+  syn boolean BodyDecl.isStaticInitializer() = false;
+  eq StaticInitializer.isStaticInitializer() = true;
+
+  /**
+   * Returns a list of instance initializers declared within the class.
+   *
+   * @return A list of instance initializers.
+   */
+  syn java.util.List<InstanceInitializer> ClassDecl.getInstanceInitailizer() {
+    java.util.List<InstanceInitializer> init = new ArrayList<>();
+    for (BodyDecl bd : getBodyDeclList()) {
+      if (bd.isInstanceInitializer()) {
+        init.add((InstanceInitializer)bd);
+      }
+    }
+    return init;
+  }
+
+  /**
+   * Returns a list of static initializers declared within the class.
+   *
+   * @return A list of static initializers.
+   */
+  syn java.util.List<StaticInitializer> ClassDecl.getStaticInitailizer() {
+    java.util.List<StaticInitializer> init = new ArrayList<>();
+    for (BodyDecl bd : getBodyDeclList()) {
+      if (bd.isStaticInitializer()) {
+        init.add((StaticInitializer)bd);
+      }
+    }
+    return init;
+  }
+
+  /**
+   * Inherited attribute that represents the type declaration where this method
+   * is declared.
+   *
+   * @return The type declaration where this method is declared.
+   */
+  inh TypeDecl MethodDecl.declaredIn();
+  eq ClassDecl.getChild().declaredIn() = this;
+  eq InterfaceDecl.getChild().declaredIn() = this;
+  eq Program.getChild().declaredIn() = null;
+}
+
+aspect AttributeKind {
+
+  syn String Annotation.getKind(int i) {
+    try {
+      ElementValuePair pair = getElementValuePair(i);
+      ElementConstantValue ecv = (ElementConstantValue)pair.getElementValue();
+      Expr e = ecv.getExpr();
+      Dot d = (Dot)e;
+      VarAccess va = (VarAccess)d.lastAccess();
+      return va.getID();
+    } catch (Throwable ignored) {
+      try {
+        ElementValuePair pair = getElementValuePair(i);
+        return pair.getName();
+      } catch (Throwable t) {
+      }
+      // it's not an attribute
+    }
+    return "";
+  }
+
+  syn boolean Modifier.isAnAttribute() = false;
+  eq Annotation.isAnAttribute() = isCollectionAttribute() || isSynAttribute() ||
+                                  isInhAttribute() || isCircularAttribute();
+
+  syn boolean Modifier.isCollectionAttribute() = false;
+  eq Annotation.isCollectionAttribute() = getKind(0).equals("COLL");
+
+  syn boolean Modifier.isSynAttribute() = false;
+  eq Annotation.isSynAttribute() = getKind(0).equals("SYN");
+
+  syn boolean Modifier.isInhAttribute() = false;
+  eq Annotation.isInhAttribute() = getKind(0).equals("INH");
+
+  syn boolean Modifier.isCircularAttribute() = false;
+  eq Annotation.isCircularAttribute() = getKind(1).equals("isCircular");
+
+public
+  boolean InvocationTarget.hasAttributeInModifiers(
+      Iterable<Modifier> modifiers, Predicate<Modifier> attributeCheck) {
+    for (Modifier m : modifiers) {
+      if (attributeCheck.test(m)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  syn boolean InvocationTarget.isAnAttribute() = false;
+  eq MethodDecl.isAnAttribute() {
+    return hasAttributeInModifiers(getModifiers().getModifiers(),
+                                   Modifier::isAnAttribute);
+  }
+
+  syn boolean InvocationTarget.isSynAttribute() = false;
+  eq MethodDecl.isSynAttribute() {
+    return hasAttributeInModifiers(getModifiers().getModifiers(),
+                                   Modifier::isSynAttribute);
+  }
+
+  syn boolean InvocationTarget.isInhAttribute() = false;
+  eq MethodDecl.isInhAttribute() {
+    return hasAttributeInModifiers(getModifiers().getModifiers(),
+                                   Modifier::isInhAttribute);
+  }
+
+  syn boolean InvocationTarget.isCircularAttribute() = false;
+  eq MethodDecl.isCircularAttribute() {
+    return hasAttributeInModifiers(getModifiers().getModifiers(),
+                                   Modifier::isCircularAttribute);
+  }
+
+  syn boolean InvocationTarget.isCollectionAttribute() = false;
+  eq MethodDecl.isCollectionAttribute() {
+    return hasAttributeInModifiers(getModifiers().getModifiers(),
+                                   Modifier::isCollectionAttribute);
+  }
+
+  syn java.util.List<String> InvocationTarget.getKindOfAttribute() {
+    java.util.List<String> kinds = new ArrayList<String>();
+    if (isSynAttribute()) {
+      kinds.add("syn");
+    }
+    if (isInhAttribute()) {
+      kinds.add("inh");
+    }
+    if (isCircularAttribute()) {
+      kinds.add("circular");
+    }
+    if (isCollectionAttribute()) {
+      kinds.add("collection");
+    }
+    if (kinds.isEmpty()) {
+      kinds.add("method");
+    }
+    return kinds;
+  }
+}

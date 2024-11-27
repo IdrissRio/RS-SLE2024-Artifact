@@ -1,0 +1,8 @@
+A ::= B | C | D;
+B ::= ;
+C ::= "if" E "then" S "else" S;
+D ::= ;
+E ::= F | "do" G;
+F ::= ;
+G ::= ;
+S ::= ;

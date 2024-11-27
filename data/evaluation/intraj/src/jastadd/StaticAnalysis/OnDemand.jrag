@@ -1,0 +1,42 @@
+aspect OnDemand{
+
+	coll Set<Warning> MethodDecl.NPA()[new TreeSet<Warning>()] with add root MethodDecl;
+	coll Set<Warning> MethodDecl.DAA()[new TreeSet<Warning>()] with add root MethodDecl;
+
+	inh MethodDecl VarAccess.enclosingMethod();
+	inh MethodDecl AssignExpr.enclosingMethod();
+	inh MethodDecl VariableDeclarator.enclosingMethod();
+	inh MethodDecl UnaryIncDec.enclosingMethod();
+	eq MethodDecl.getChild().enclosingMethod() = this;
+	eq Program.getChild().enclosingMethod() {
+		throw new RuntimeException("Program.getChild().enclosingMethod() not implemented");
+	}
+
+	VarAccess contributes warning(
+    getCompilationUnit().pathName(),
+      "A 'NullPointerException' could be thrown;'" + name() + "' is nullable.",
+      Analysis.AvailableAnalysis.NPA,
+      null, null) when
+	isNullable() to MethodDecl.NPA();
+
+
+	AssignExpr contributes warning(
+		getCompilationUnit().pathName(),
+		"The value stored in '" + getDest().varDecl().name() + "' is never read.",
+		Analysis.AvailableAnalysis.DAA, null, null) when
+	DAA_isDeadAssign() to MethodDecl.DAA() for enclosingMethod();
+  
+	VariableDeclarator contributes warning(
+		getCompilationUnit().pathName(),
+		"The value stored in '" + singletonValue().name() + "' is never read.",
+		Analysis.AvailableAnalysis.DAA, null, null) when
+	DAA_isDeadAssign() to MethodDecl.DAA() for enclosingMethod();
+  
+	UnaryIncDec contributes warning(
+		getCompilationUnit().pathName(),
+		"The value stored in '" + getOperand().varDecl().name() +
+			"' is never read.",
+		Analysis.AvailableAnalysis.DAA, null, null) when
+	DAA_isDeadAssign() to MethodDecl.DAA() for enclosingMethod();
+
+}

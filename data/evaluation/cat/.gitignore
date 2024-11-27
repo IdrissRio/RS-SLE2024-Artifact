@@ -1,0 +1,40 @@
+# Gradle files.
+/.gradle/
+/build/
+
+# Eclipse files.
+/bin/
+/.classpath
+/.project
+/.settings/
+
+# Generated files
+/src/gen/
+/src/gen-res/
+/*.jar
+/*.zip
+
+# Vim swap files.
+*.swp
+
+.DS_Store
+
+*.out
+
+.vscode/
+.VSCodeCounter/
+
+evaluation/antlr-2.7.2/
+
+
+.ipynb_checkpoints
+
+examples/*/.gradle/
+examples/*/build/
+examples/StateMachine/StateMachine.jar
+examples/*/bin/
+examples/*/out/
+examples/*/ast/
+examples/*/Makefile
+
+

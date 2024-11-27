@@ -1,0 +1,49 @@
+aspect PrettyPrint {
+
+  // *** API ***
+
+  // A contextfree grammar has a String attribute *pp()*
+  // which is a prettyprinted representation of the grammar
+  syn String CFG.pp();
+  
+  
+  // *** Implementation ***
+  
+  eq CFG.pp() {
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i< getNumRule(); i++) {
+      sb.append(getRule(i).pp());
+    }
+    return sb.toString();
+  }
+  
+  syn String Rule.pp() {
+    StringBuffer sb = new StringBuffer();
+    sb.append(getNDecl().pp());
+    sb.append(" ::= ");
+    if (getNumProd() > 0) 
+      sb.append(getProd(0).pp());
+    for (int i = 1; i< getNumProd(); i++) {
+      sb.append("|" + getProd(i).pp());
+    }
+    sb.append(";\n");
+    return sb.toString();
+  }
+  
+  syn String Prod.pp() {
+    StringBuffer sb = new StringBuffer();
+    
+    for (int i = 0; i< getNumSymbol(); i++) {
+      sb.append(" " + getSymbol(i).pp());
+    }
+    return sb.toString();
+  }
+  
+  syn  lazy String Symbol.pp();
+  
+  eq Terminal.pp() = getTERMINAL();
+  
+  eq NUse.pp() = getID();
+  
+  syn String NDecl.pp() = getID();
+}

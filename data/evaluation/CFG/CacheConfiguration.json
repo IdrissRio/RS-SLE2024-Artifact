@@ -1,0 +1,376 @@
+{
+  "nodes": [
+    {
+      "methodName": "AST.NDecl::follow()",
+      "sccId": 0,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NDecl::occurences()",
+      "sccId": 12,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn"
+      ]
+    },
+    {
+      "methodName": "AST.NDecl::findUses(java.lang.String)",
+      "sccId": 13,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+        "name": "String"
+      },
+      "kind": [
+        "inh"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::follow()",
+      "sccId": 0,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::nullableSuffix()",
+      "sccId": 6,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "inh"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::nullable()",
+      "sccId": 7,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::decl()",
+      "sccId": 9,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::lookup(java.lang.String)",
+      "sccId": 10,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+        "name": "String"
+      },
+      "kind": [
+        "inh"
+      ]
+    },
+    {
+      "methodName": "AST.CFG::lookup(java.lang.String)",
+      "sccId": 11,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+        "name": "String"
+      },
+      "kind": [
+        "syn"
+      ]
+    },
+    {
+      "methodName": "AST.NDecl::nullable()",
+      "sccId": 7,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "inh",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.Prod::nullable()",
+      "sccId": 7,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.Terminal::nullable()",
+      "sccId": 8,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::firstSuffix()",
+      "sccId": 2,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "inh"
+      ]
+    },
+    {
+      "methodName": "AST.Terminal::first()",
+      "sccId": 4,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.Terminal::id()",
+      "sccId": 5,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::first()",
+      "sccId": 3,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NDecl::first()",
+      "sccId": 3,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "inh",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.Prod::first()",
+      "sccId": 3,
+      "uniqueSCCAndNoSelfLoop": false,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "syn",
+        "circular"
+      ]
+    },
+    {
+      "methodName": "AST.NUse::enclosingRule()",
+      "sccId": 1,
+      "uniqueSCCAndNoSelfLoop": true,
+      "bridge": false,
+      "extraCheck": "",
+      "paramTypes": {
+
+      },
+      "kind": [
+        "inh"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "AST.NDecl::follow()",
+      "target": "AST.NDecl::occurences()"
+    },
+    {
+      "source": "AST.NDecl::follow()",
+      "target": "AST.NUse::follow()"
+    },
+    {
+      "source": "AST.NDecl::occurences()",
+      "target": "AST.NDecl::findUses(java.lang.String)"
+    },
+    {
+      "source": "AST.NUse::follow()",
+      "target": "AST.NUse::nullableSuffix()"
+    },
+    {
+      "source": "AST.NUse::follow()",
+      "target": "AST.NUse::firstSuffix()"
+    },
+    {
+      "source": "AST.NUse::follow()",
+      "target": "AST.NUse::enclosingRule()"
+    },
+    {
+      "source": "AST.NUse::follow()",
+      "target": "AST.NDecl::follow()"
+    },
+    {
+      "source": "AST.NUse::nullableSuffix()",
+      "target": "AST.NUse::nullable()"
+    },
+    {
+      "source": "AST.NUse::nullableSuffix()",
+      "target": "AST.Terminal::nullable()"
+    },
+    {
+      "source": "AST.NUse::nullable()",
+      "target": "AST.NUse::decl()"
+    },
+    {
+      "source": "AST.NUse::nullable()",
+      "target": "AST.NDecl::nullable()"
+    },
+    {
+      "source": "AST.NUse::decl()",
+      "target": "AST.NUse::lookup(java.lang.String)"
+    },
+    {
+      "source": "AST.NUse::lookup(java.lang.String)",
+      "target": "AST.CFG::lookup(java.lang.String)"
+    },
+    {
+      "source": "AST.NDecl::nullable()",
+      "target": "AST.Prod::nullable()"
+    },
+    {
+      "source": "AST.Prod::nullable()",
+      "target": "AST.NUse::nullable()"
+    },
+    {
+      "source": "AST.Prod::nullable()",
+      "target": "AST.Terminal::nullable()"
+    },
+    {
+      "source": "AST.NUse::firstSuffix()",
+      "target": "AST.Terminal::first()"
+    },
+    {
+      "source": "AST.NUse::firstSuffix()",
+      "target": "AST.NUse::first()"
+    },
+    {
+      "source": "AST.NUse::firstSuffix()",
+      "target": "AST.NUse::nullable()"
+    },
+    {
+      "source": "AST.NUse::firstSuffix()",
+      "target": "AST.Terminal::nullable()"
+    },
+    {
+      "source": "AST.Terminal::first()",
+      "target": "AST.Terminal::id()"
+    },
+    {
+      "source": "AST.NUse::first()",
+      "target": "AST.NUse::decl()"
+    },
+    {
+      "source": "AST.NUse::first()",
+      "target": "AST.NDecl::first()"
+    },
+    {
+      "source": "AST.NDecl::first()",
+      "target": "AST.Prod::first()"
+    },
+    {
+      "source": "AST.Prod::first()",
+      "target": "AST.Terminal::first()"
+    },
+    {
+      "source": "AST.Prod::first()",
+      "target": "AST.NUse::first()"
+    },
+    {
+      "source": "AST.Prod::first()",
+      "target": "AST.NUse::nullable()"
+    },
+    {
+      "source": "AST.Prod::first()",
+      "target": "AST.Terminal::nullable()"
+    }
+  ]
+}
+

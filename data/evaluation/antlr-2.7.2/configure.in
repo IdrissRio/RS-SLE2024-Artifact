@@ -1,0 +1,93 @@
+# Process this file with autoconf to produce a configure script.
+AC_INIT(antlr, 2.7.2)
+AC_CONFIG_AUX_DIR(scripts)
+
+VERSION=`echo $PACKAGE_VERSION | cut -d . -f 1`
+SUBVERSION=`echo $PACKAGE_VERSION | cut -d . -f 2`
+PATCHLEVEL=`echo $PACKAGE_VERSION | cut -d . -f 3`
+
+AC_SUBST(VERSION)
+AC_SUBST(SUBVERSION)
+AC_SUBST(PATCHLEVEL)
+
+AC_MSG_CHECKING(if examples must be built)
+AC_ARG_ENABLE(examples,
+[  --enable-examples             Compile examples per default],
+	WITH_EXAMPLES=yes,
+	WITH_EXAMPLES=no
+)
+AC_SUBST(WITH_EXAMPLES)
+AC_MSG_RESULT($WITH_EXAMPLES)
+
+# Hmmm don't really need this...
+#AC_MSG_CHECKING(if java sources have to be installed)
+#AC_ARG_ENABLE(install_java_source,
+#[  --enable-install-java-source  Install antlr sources],
+#	INSTALL_JAVA_SOURCE=yes,
+#	INSTALL_JAVA_SOURCE=no
+#)
+#AC_SUBST(INSTALL_JAVA_SOURCE)
+#AC_MSG_RESULT($INSTALL_JAVA_SOURCE)
+
+AC_MSG_CHECKING(if BOOTSTRAP_JAR is set)
+test -z "${BOOTSTRAP_JAR}" && BOOTSTRAP_JAR="${TOPDIR}/antlrall.jar"
+AC_ARG_VAR(BOOTSTRAP_JAR,[An alternative ANTLR jar to bootstrap a cleaned distribution])
+AC_MSG_RESULT(${BOOTSTRAP_JAR})
+
+# Checks for system programs listed in Config.make(.in)...
+# XXX: Should AC_PATH_PROG(S) be replaced by AC_PATH_TOOL(S) for consistency
+# XXX: with, e.g., AC_PROG_RANLIB, that sets its variable to ":" when the
+# XXX: requested tool can not be found.
+test -z "$AR"         && AC_PATH_PROGS(AR, ar$EXEEXT gar$EXEEXT, ar$EXEEXT )
+test -z "$AS"         && AC_PATH_PROGS(AS, as$EXEEXT gas$EXEEXT, as$EXEEXT )
+
+# C/C++
+AC_PROG_CC
+	if test "$GCC" = yes; then
+		CFLAGS="-g -O2 -W -Wall -pipe"
+	fi
+AC_PROG_CPP
+AC_PROG_CXX
+	if test "$GXX" = yes; then
+		CXXFLAGS="-g -O2 -felide-constructors -W -Wall -pipe"
+	fi
+AC_PROG_CXXCPP
+
+test -z "$DOXYGEN"    && AC_PATH_PROG(DOXYGEN, doxygen, doxygen,  )
+AC_PROG_INSTALL
+
+# Java
+AC_CHECK_CLASSPATH
+AC_JAVA_OPTIONS
+AC_PROG_JAVAC
+AC_PROG_JAVA
+AC_PROG_JAR
+
+test -z "$LD"         && AC_PATH_PROGS(LD, ld$EXEEXT gld$EXEEXT, ld$EXEEXT )
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+test -z "$MAKEDEPEND" && AC_PATH_PROG(MAKEDEPEND, makedepend$EXEEXT, makedepend$EXEEXT )
+test -z "$MKDIR"      && AC_PATH_PROG(MKDIR, mkdir$EXEEXT, mkdir$EXEEXT )
+test -z "$NM"         && AC_PATH_PROGS(NM, nm$EXEEXT gnm$EXEEXT, nm$EXEEXT )
+AC_PROG_RANLIB
+test -z "$RM"         && AC_PATH_PROG(RM, rm$EXEEXT, rm$EXEEXT )
+test -z "$STRIP"      && AC_PATH_PROGS(STRIP, strip$EXEEXT gstrip$EXEEXT, strip$EXEEXT )
+test -z "$TAR"	      && AC_PATH_PROGS(TAR, gtar$EXEEXT tar$EXEEXT, tar$EXEEXT )
+test -z "$TCL"	      && AC_PATH_PROG(TCL, tclsh$EXEEXT, tclsh$EXEEXT )
+test -z "$TOUCH"      && AC_PATH_PROG(TOUCH, touch$EXEEXT, touch$EXEEXT )
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+#AC_FUNC_STAT
+AC_CHECK_FUNCS([strcasecmp])
+
+AC_CONFIG_FILES([scripts/Config.make scripts/antlr-config scripts/run-antlr])
+AC_OUTPUT

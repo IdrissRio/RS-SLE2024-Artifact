@@ -1,0 +1,32 @@
+import java.util.HashSet;
+
+aspect NameAnalysis {
+
+  // *** API ***
+
+  // A use of a nonterminal has a *decl* attribute
+  // referring to the appropriate nonterminal declaration
+  syn lazy NDecl NUse.decl();
+  
+  
+  // *** Implementation ***
+  
+  eq NUse.decl() = lookup(getID());
+  inh lazy NDecl NUse.lookup(String name);
+  
+  eq CFG.getRule().lookup(String name) = lookup(name);
+
+  syn lazy NDecl CFG.lookup(String name) {
+    for (int k = 0; k < getNumRule(); k++) {
+      if (getRule(k).getNDecl().getID().equals(name))
+        return getRule(k).getNDecl();
+    }
+    return null;
+  }
+  
+  syn lazy String Symbol.id();
+  
+  eq Terminal.id() = getTERMINAL().substring(1,getTERMINAL().length()-1);
+  
+  eq NUse.id() = getID();
+}

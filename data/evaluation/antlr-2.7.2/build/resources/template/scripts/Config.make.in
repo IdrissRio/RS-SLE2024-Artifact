@@ -1,0 +1,85 @@
+###############################################################################
+# $Id: //depot/code/org.antlr/dev/klaren.dev/Config.make.in $
+###############################################################################
+
+.EXPORT_ALL_VARIABLES:
+
+# For package installers..
+DESTDIR     =
+
+# usual dribble
+prefix      = @prefix@
+exec_prefix = @exec_prefix@
+datadir     = @datadir@
+libdir      = @libdir@
+includedir  = @includedir@
+bindir      = @bindir@
+
+# Version stuff...
+VERSION         = @VERSION@
+SUBVERSION      = @SUBVERSION@
+PATCHLEVEL      = @PATCHLEVEL@
+PACKAGE_NAME    = @PACKAGE_NAME@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+versioneddir    = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+
+# Programs we might use and their options...
+ANTLR    = $(JAVA) -cp $(TOPDIR)/antlrall.jar antlr.Tool
+# antlr is used to build antlr
+ANTLR_BOOTSTRAP = $(JAVA) -cp @BOOTSTRAP_JAR@ antlr.Tool
+
+CXX = @CXX@
+   CXXFLAGS = @CXXFLAGS@ $(ARCHFLAGS) $(INCLUDE) $(DEBUG) $(EXTRA_CXXFLAGS)
+   EXTRA_CXXFLAGS =
+
+CC = @CC@
+   CFLAGS       = @CFLAGS@
+   DEBUG        = -g -D__DEBUG__
+   EXTRA_CFLAGS =
+   INCLUDE      =
+   LDFLAGS      = @LDFLAGS@
+
+CPP = @CPP@
+   CPPFLAGS = @CPPFLAGS@
+
+CXXCPP = @CXXCPP@
+AR     = @AR@
+AS     = @AS@
+LD     = @LD@
+RANLIB = @RANLIB@
+STRIP  = @STRIP@
+
+DOXYGEN  = @DOXYGEN@
+   DOXYGEN_FLAGS  =
+
+JAVA     = @JAVA@
+   JAVA_FLAGS  = @JAVAFLAGS@
+   JAVA_PREFIX    = @JAVAPREFIX@
+
+JAVAC    = @JAVAC@
+   JAVAC_FLAGS = @JAVACFLAGS@
+
+JAR      = @JAR@
+
+INSTALL  = @INSTALL@
+MAKEDEP  = @MAKEDEPEND@
+MKDIR    = @MKDIR@
+NM       = @NM@
+RM       = @RM@
+TAR      = @TAR@
+TCL      = @TCL@
+TOUCH    = @TOUCH@
+
+#
+# From configure enabled features...
+#
+WITH_EXAMPLES  = @WITH_EXAMPLES@
+
+#
+# These are used for the examples
+#
+ANTLR_INCS = -I$(TOPDIR)/lib/cpp
+ANTLR_LIBS = -L$(TOPDIR)/lib/cpp/src -lantlr
+
+DMALLOC_LIBS = -L/local/klaren/lib -ldmalloc
+DMALLOC_INC  = -I/local/klaren/include

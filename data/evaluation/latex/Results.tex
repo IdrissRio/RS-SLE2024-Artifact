@@ -1,0 +1,154 @@
+\documentclass[acmsmall, screen, review, nonacm]{acmart}
+
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{array}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,shapes,matrix}
+\input{macros.tex}
+
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2018}
+\acmYear{2018}
+\acmDOI{XXXXXXX.XXXXXXX}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[PLDI]{}{October 20-25,
+  2024}{Pasadena, USA}
+
+
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+
+
+\begin{document}
+
+
+
+\title{Artifact Evaluation Results}
+\subtitle{Efficient Demand Evaluation of Fixed-Point Attributes Using Static Analysis}
+
+
+\author{Idriss Riouak}
+\email{idriss.riouak@cs.lth.se}
+\orcid{0000-0003-3520-2262}
+\author{Niklas Fors}
+\email{niklas.fors@cs.lth.se}
+\orcid{0000-0003-2714-9457}
+\affiliation{%
+  \institution{Lund University}
+  \streetaddress{Ole R\"{o}mers v\"{a}g 3}
+  \city{Lund}
+  \country{Sweden}
+  \postcode{22363}
+}
+
+\author{Jesper {\"O}qvist}
+\email{jesper.oqvist@cognibotics.com }
+\affiliation{%
+  \institution{Cognibotics AB}
+  \streetaddress{Scheelevägen 15}
+  \city{Lund}
+  \country{Sweden}
+  \postcode{22370}
+}
+\orcid{0000-0001-5453-3695}
+\author{G{\"o}rel Hedin}
+\email{gorel.hedin@cs.lth.se}
+\orcid{0000-0002-3003-2623}
+\author{Christoph Reichenbach}
+\email{chirstoph.reichenbach@cs.lth.se}
+\orcid{0000-0003-0608-7023}
+\affiliation{%
+  \institution{Lund University}
+  \streetaddress{Ole R\"{o}mers v\"{a}g 3}
+  \city{Lund}
+  \country{Sweden}
+  \postcode{22363}
+}
+
+
+
+\renewcommand{\shortauthors}{Riouak et al.}
+
+
+\maketitle
+
+This document presents the results of our artifact evaluation. Each section
+includes data generated from executing our artifact. The data is presented in
+tables and figures with references to the corresponding sections in the paper.
+
+\section{Case Study: LL(1) Parser Construction}
+This section presents the results of the LL(1) Parser Construction case study.
+This case study corresponds to Section~5.2 in the paper.
+
+\input{cfg-table.tex}
+
+
+
+\section{Case Study: \textsc{IntraJ}}
+This section presents the results of the \textsc{IntraJ} case study.
+This case study corresponds to Section~5.4 in the paper.
+
+
+\subsection{Dead Assignment Analysis (DAA)}
+Table~\ref{tab:daa} presents the results of the Null-pointer Exception Analysis, corresponding to the right portion of Table~3 in the referenced paper.
+
+\input{intraj-table-daa.tex}
+
+
+
+
+\subsection{Null-pointer Exception Analysis (NPA)}
+Table~\ref{tab:npa} presents the results of the Null-pointer Exception Analysis, corresponding to the left portion of Table~3 in the referenced paper.
+\input{intraj-table-npa.tex}
+
+
+
+
+\section{On-Demand Analysis}
+This section presents a comparative analysis of \IntraJ{}'s steady-state execution time.
+The figures show the average execution time for both Dead Assignment Analysis and Null-pointer Exception Analysis.
+The analysis is conducted on 10, 20, 50, 100, and 200 methods randomly selected from each analysed benchmark.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{intraj_ondemand_daa_relaxedmonolithic_vs_intraj_ondemand_daa_relaxedstackedon-demand.pdf}
+  \caption{
+    Steady-state performance of running dead assignment (left) and null-pointer dereference analysis (right) for randomly selected sets of methods. Solid lines represent execution time (left axis, seconds). Dashed lines represent successor attribute evaluations (right axis, count). Red lines represent RelaxedMonolithic, green lines RelaxedStacked.
+  }
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{intraj_ondemand_npa_relaxedmonolithic_vs_intraj_ondemand_npa_relaxedstackedon-demand.pdf}
+  \caption{
+    Steady-state performance of running dead assignment (left) and null-pointer dereference analysis (right) for randomly selected sets of methods. Solid lines represent execution time (left axis, seconds). Dashed lines represent successor attribute evaluations (right axis, count). Red lines represent RelaxedMonolithic, green lines RelaxedStacked.
+  }
+\end{figure}
+
+\appendix
+\section{Case Study: \textsc{ExtendJ}}
+This section presents the results of the \textsc{ExtendJ} case study, which
+correspond to Appendix B of the paper. Table~\ref{tab:extendj} provides the
+performance results for the \ExtendJ{} compiler, illustrating both startup and
+steady-state performance for \relaxedMonolithic{} and \relaxedstacked{}
+configurations. Table~\ref{tab:extendj} aligns with Table~4 in the
+paper.
+
+
+\input{extendj-table.tex}
+
+\end{document}
+\endinput

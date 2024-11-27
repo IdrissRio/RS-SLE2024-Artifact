@@ -1,0 +1,25 @@
+\begin{table}[H]
+	\begin{tabular}{|l|rrr|rrr|}
+	\hline
+	\multirow{3}{*}{\textsc{Benchmark}} & \multicolumn{3}{c|}{\textsc{Start up}} & \multicolumn{3}{c|}{\textsc{Steady State}} \\ \cline{2-7}
+	& \multicolumn{1}{c|}{\textsc{Relaxed-}} & \multicolumn{2}{c|}{\textsc{Relaxed-}} & \multicolumn{1}{c|}{\textsc{Relaxed-}} & \multicolumn{2}{c|}{\textsc{Relaxed-}} \\
+	& \multicolumn{1}{c|}{\textsc{Monolithic}} & \multicolumn{2}{c|}{\textsc{Stacked}} & \multicolumn{1}{c|}{\textsc{Monolithic}} & \multicolumn{2}{c|}{\textsc{Stacked}} \\ \cline{2-7}
+	& \multicolumn{1}{c|}{Time (s)} & \multicolumn{1}{c|}{Time (s)} & \textsc{Speedup} & \multicolumn{1}{c|}{Time (s)} & \multicolumn{1}{c|}{Time (s)} & \textsc{Speedup} \\ \hline
+	 \code{commons-cli} & \multicolumn{1}{r|}{\eval{1.01}{0.04}} & \multicolumn{1}{r|}{\eval{1.01}{0.14}} & \same{} & \multicolumn{1}{r|}{\eval{0.23}{0.01}} & \multicolumn{1}{r|}{\eval{0.24}{0.02}} & \same{} \\ \hline
+	 \code{jackson-dataformat-xml} & \multicolumn{1}{r|}{\eval{2.41}{0.20}} & \multicolumn{1}{r|}{\eval{2.39}{0.64}} & \same{} & \multicolumn{1}{r|}{\eval{0.69}{0.10}} & \multicolumn{1}{r|}{\eval{0.68}{0.01}} & \same{} \\ \hline
+	 \code{commons-jxpath} & \multicolumn{1}{r|}{\eval{1.74}{0.22}} & \multicolumn{1}{r|}{\eval{1.73}{0.22}} & \same{} & \multicolumn{1}{r|}{\eval{0.44}{0.01}} & \multicolumn{1}{r|}{\eval{0.44}{0.12}} & \same{} \\ \hline
+	 \code{antlr-2.7.2} & \multicolumn{1}{r|}{\eval{1.94}{0.23}} & \multicolumn{1}{r|}{\eval{2.01}{0.13}} & \slowdownnew{0.96} & \multicolumn{1}{r|}{\eval{0.63}{0.13}} & \multicolumn{1}{r|}{\eval{0.60}{0.05}} & \speedupnew{1.05} \\ \hline
+	 \code{jackson-core} & \multicolumn{1}{r|}{\eval{3.51}{0.22}} & \multicolumn{1}{r|}{\eval{3.36}{0.16}} & \speedupnew{1.04} & \multicolumn{1}{r|}{\eval{1.06}{0.15}} & \multicolumn{1}{r|}{\eval{1.08}{0.18}} & \same{} \\ \hline
+	 \code{pmd-4.2.5} & \multicolumn{1}{r|}{\eval{4.47}{0.21}} & \multicolumn{1}{r|}{\eval{4.47}{0.26}} & \same{} & \multicolumn{1}{r|}{\eval{1.48}{0.10}} & \multicolumn{1}{r|}{\eval{1.47}{0.02}} & \same{} \\ \hline
+	 \code{struts} & \multicolumn{1}{r|}{\eval{6.03}{0.36}} & \multicolumn{1}{r|}{\eval{5.88}{0.52}} & \speedupnew{1.03} & \multicolumn{1}{r|}{\eval{2.26}{0.34}} & \multicolumn{1}{r|}{\eval{2.22}{0.06}} & \same{} \\ \hline
+	 \code{joda-time} & \multicolumn{1}{r|}{\eval{5.35}{0.40}} & \multicolumn{1}{r|}{\eval{5.09}{0.42}} & \speedupnew{1.05} & \multicolumn{1}{r|}{\eval{2.20}{0.29}} & \multicolumn{1}{r|}{\eval{2.18}{0.02}} & \same{} \\ \hline
+	 \code{jfreechart-1.0.0} & \multicolumn{1}{r|}{\eval{4.53}{0.32}} & \multicolumn{1}{r|}{\eval{4.68}{0.22}} & \slowdownnew{0.97} & \multicolumn{1}{r|}{\eval{1.97}{0.14}} & \multicolumn{1}{r|}{\eval{1.98}{0.16}} & \same{} \\ \hline
+	 \code{fop-0.95} & \multicolumn{1}{r|}{\eval{5.72}{0.30}} & \multicolumn{1}{r|}{\eval{5.69}{0.45}} & \same{} & \multicolumn{1}{r|}{\eval{2.28}{0.14}} & \multicolumn{1}{r|}{\eval{2.29}{0.19}} & \same{} \\ \hline
+	 \code{extendj\_eval} & \multicolumn{1}{r|}{\eval{7.24}{0.53}} & \multicolumn{1}{r|}{\eval{7.26}{0.69}} & \same{} & \multicolumn{1}{r|}{\eval{4.53}{0.32}} & \multicolumn{1}{r|}{\eval{4.40}{0.43}} & \speedupnew{1.03} \\ \hline
+	 \code{castor-1.3.3} & \multicolumn{1}{r|}{\eval{7.58}{0.25}} & \multicolumn{1}{r|}{\eval{7.59}{0.40}} & \same{} & \multicolumn{1}{r|}{\eval{3.87}{0.12}} & \multicolumn{1}{r|}{\eval{3.91}{0.17}} & \same{} \\ \hline
+	 \code{weka} & \multicolumn{1}{r|}{\eval{11.49}{0.56}} & \multicolumn{1}{r|}{\eval{11.38}{0.55}} & \same{} & \multicolumn{1}{r|}{\eval{6.25}{0.26}} & \multicolumn{1}{r|}{\eval{6.15}{0.35}} & \same{} \\ \hline
+	 \code{poi-3.11} & \multicolumn{1}{r|}{\eval{16.23}{0.70}} & \multicolumn{1}{r|}{\eval{16.21}{1.06}} & \same{} & \multicolumn{1}{r|}{\eval{9.12}{0.35}} & \multicolumn{1}{r|}{\eval{9.20}{0.42}} & \same{} \\ \hline
+	\end{tabular}
+    \caption{\label{tab:extendj} Performance comparison of ExtendJ’s execution time during startup and steady state.}
+    
+\end{table}

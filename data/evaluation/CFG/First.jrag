@@ -1,0 +1,43 @@
+import java.util.*;
+aspect First {
+  
+  // *** API ***
+
+  // A nonterminal has an attribute *first*
+  // - the set of terminal symbols that derivations of the nonterminal can start with
+  inh lazy Set NDecl.first() circular [new HashSet()]; // The set of first symbols
+  
+  
+  // *** Implementation ***
+  
+  syn lazy Set Prod.first() circular [new HashSet()] {
+    Set firstSet = new HashSet();
+    if(getNumSymbol() == 0)
+        return firstSet;
+      firstSet.addAll(getSymbol(0).first());
+      for(int i = 1; i < getNumSymbol() && getSymbol(i-1).nullable(); i++) {
+        firstSet.addAll(getSymbol(i).first());
+      }
+    return firstSet;
+  }
+  
+  syn lazy Set Symbol.first() circular [new HashSet()] ;
+  
+  eq Terminal.first() {
+    Set firstSet =  new HashSet();
+    firstSet.add(id());
+    return firstSet;
+  }
+  
+  eq NUse.first() {
+    return decl().first();
+  }
+  
+  eq Rule.getNDecl().first() {
+    Set firstSet = new HashSet();
+    for (int i = 0; i < getNumProd(); i++) {
+      firstSet.addAll(getProd(i).first());
+    }
+    return firstSet;
+  }
+}

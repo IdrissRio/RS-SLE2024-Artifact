@@ -1,0 +1,6 @@
+Authors:
+- Idriss Riouak (idriss.riouak@cs.lth.se), Lund University, Sweden
+- Niklas Fors (niklas.fors@cs.lth.se), Lund University, Sweden
+- Jesper Öqvist (jesper.oqvist@cognibotics.com), Cognibotics AB, Sweden
+- Görel Hedin (gorel.hedin@cs.lth.se), Lund University, Sweden
+- Christoph Reichenbach (christoph.reichenbach@cs.lth.se), Lund University, Sweden

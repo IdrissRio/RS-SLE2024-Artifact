@@ -1,0 +1,36 @@
+plugins {
+  id 'java'
+  id "org.sonarqube" version "3.1.1"
+}
+
+
+sourceSets {
+    template {
+        resources {
+            srcDir './'
+            include '**/*'
+        }
+    }
+}
+
+processTemplateResources {
+    doLast {
+        println sourceSets.template.output.classesDir
+        FileTree tree = fileTree(dir: sourceSets.template.output.resourcesDir)
+        tree.forEach {
+            println it
+        }
+    }
+}
+
+jar {
+    from sourceSets.main.output
+    from sourceSets.template.output
+}
+
+defaultTasks 'build'
+
+
+
+
+

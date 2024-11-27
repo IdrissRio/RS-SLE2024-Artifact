@@ -1,0 +1,73 @@
+import java.util.*;
+aspect Follow {
+  
+  // *** API ***
+
+  // A nonterminal has an attribute *follow*
+  // - the set of terminal symbols that can follow this nonterminal in a derivation
+  syn lazy Set NDecl.follow() circular [new HashSet()];
+  
+  
+  // *** Implementation ***
+  
+  eq NDecl.follow() {
+    Set f = new HashSet();
+    for (Iterator iter = occurences().iterator(); iter.hasNext();) {
+      NUse u = (NUse) iter.next();
+      f.addAll(u.follow());
+    }
+    return f;
+  }
+  
+  syn lazy Set NUse.follow() circular [new HashSet()]{
+    if (nullableSuffix()) {
+      Set s = new HashSet();
+      s.addAll(firstSuffix());
+      s.addAll(enclosingRule().getNDecl().follow());
+      return s;
+    }
+    else {
+      return firstSuffix();
+    }
+  }
+  
+  // Help attributes and methods
+
+  syn lazy Set NDecl.occurences() = findUses(getID());
+  inh lazy boolean NUse.nullableSuffix(); // Returns true if all symbols following NUse are nullable
+  inh lazy Set NUse.firstSuffix(); // Returns the FIRST set of the substring following NUse
+  inh lazy Rule NUse.enclosingRule();
+
+  eq Rule.getProd(int index).enclosingRule() = this;
+  eq Prod.getSymbol(int index).nullableSuffix() {
+    for (int i=index+1; i< getNumSymbol(); i++) {
+      if (!getSymbol(i).nullable()) return false;
+    }
+    return true;
+  }
+  eq Prod.getSymbol(int index).firstSuffix() {
+    Set s = new HashSet();
+    for (int i=index+1; i< getNumSymbol(); i++) {
+      s.addAll(getSymbol(i).first());
+      if (!getSymbol(i).nullable()) return s;
+    }
+    return s;
+  }
+  
+  inh lazy Set NDecl.findUses(String name);
+  eq CFG.getRule(int index).findUses(String name) {
+     Set result = new HashSet();
+     collectUses(result, name);
+     return result;
+  }
+  protected void ASTNode.collectUses(Set s, String name) {
+     for (int i=0; i<getNumChild();i++) {
+        getChild(i).collectUses(s, name);
+     }
+  }
+  protected void NUse.collectUses(Set s, String name) {
+     if (name.equals(getID())) s.add(this);
+     super.collectUses(s, name);
+  }
+      
+}

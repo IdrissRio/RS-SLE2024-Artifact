@@ -1,0 +1,17 @@
+Abstract:
+
+This artifact supports the evaluation of a new demand-driven algorithm for
+efficient circular Reference Attribute Grammar evaluation, specifically designed
+to improve performance in higly circular applications, e.g., dataflow analyses
+for Java. The artifact includes all necessary tools, dependencies, benchmarks, and scripts to
+reproduce the experiments presented in the corresponding paper. It provides a
+Docker-based setup for easy deployment, as well as detailed instructions for
+manual installation. The artifact allows users to explore and validate the
+proposed algorithm's performance improvements through real-world case studies,
+demonstrating significant speedups in dead-assignment and null-pointer
+dereference analyses compared to existing algorithms.
+While the artifact does not require specific hardware,
+reproducing the experiments as described in the paper may take one to two days
+of computation time. The artifact has been tested on Linux and macOS, ensuring
+broad compatibility and ease of use.
+

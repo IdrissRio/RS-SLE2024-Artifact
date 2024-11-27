@@ -1,0 +1,39 @@
+aspect Nullable {
+
+  // *** API ***
+
+  // A nonterminal has a boolean attribute *nullable*
+  // which is true if the nonterminal can derive the empty string.
+  inh lazy boolean NDecl.nullable() circular [false];
+
+  
+  // *** Implementation ***
+
+  syn lazy boolean Prod.nullable() circular [false];
+  
+  syn lazy boolean Symbol.nullable() circular [false];
+    
+  eq Terminal.nullable() {  
+     return false;
+  }
+  
+  eq NUse.nullable(){
+    return decl().nullable();
+  }
+  
+  eq Rule.getNDecl().nullable() {
+    for (int i = 0; i < getNumProd(); i++) {
+      if (getProd(i).nullable())
+        return true;
+    }
+    return false;
+  }
+  
+  eq Prod.nullable() { 
+    for (int i = 0; i < getNumSymbol(); i++) {
+      if (!getSymbol(i).nullable())
+        return false;
+    }
+    return true;
+  }
+}

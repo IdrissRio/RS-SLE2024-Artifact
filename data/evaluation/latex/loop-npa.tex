@@ -1,0 +1,16 @@
+\begin{table}[H]
+	\begin{tabular}{|l|ccc|ccc|}
+	\hline
+	\multirow{3}{*}{\textsc{Benchmark}} & \multicolumn{3}{c|}{\textsc{Start up}} & \multicolumn{3}{c|}{\textsc{Steady State}} \\ \cline{2-7}
+	& \multicolumn{1}{c|}{\intrajbaseline} & \multicolumn{2}{c|}{\intrajrelaxed} & \multicolumn{1}{c|}{\intrajbaseline} & \multicolumn{2}{c|}{\intrajrelaxed} \\ \cline{2-7}
+	& \multicolumn{1}{c|}{Time (s)} & \multicolumn{1}{c|}{Time (s)} & \textsc{Speedup} & \multicolumn{1}{c|}{Time (s)} & \multicolumn{1}{c|}{Time (s)} & \textsc{Speedup} \\ \hline
+	\code{loopclass0} & \multicolumn{1}{c|}{\eval{0.20}{0.00}} & \multicolumn{1}{c|}{\eval{0.20}{0.00}} & \same{} & \multicolumn{1}{c|}{\eval{0.00}{0.00}} & \multicolumn{1}{c|}{\eval{0.00}{0.00}} & \same{} \\ \hline
+	\code{loopclass20} & \multicolumn{1}{c|}{\eval{0.46}{0.01}} & \multicolumn{1}{c|}{\eval{0.30}{0.01}} & \speedupnew{1.52} & \multicolumn{1}{c|}{\eval{0.08}{0.00}} & \multicolumn{1}{c|}{\eval{0.01}{0.00}} & \speedupnew{8.73} \\ \hline
+	\code{loopclass50} & \multicolumn{1}{c|}{\eval{1.83}{0.01}} & \multicolumn{1}{c|}{\eval{0.41}{0.01}} & \speedupnew{4.47} & \multicolumn{1}{c|}{\eval{1.27}{0.03}} & \multicolumn{1}{c|}{\eval{0.06}{0.00}} & \speedupnew{23.03} \\ \hline
+	\code{loopclass100} & \multicolumn{1}{c|}{\eval{10.79}{0.14}} & \multicolumn{1}{c|}{\eval{0.85}{0.02}} & \speedupnew{12.65} & \multicolumn{1}{c|}{\eval{10.27}{0.15}} & \multicolumn{1}{c|}{\eval{0.33}{0.01}} & \speedupnew{31.06} \\ \hline
+	\code{loopclass200} & \multicolumn{1}{c|}{\eval{85.55}{1.18}} & \multicolumn{1}{c|}{\eval{3.29}{0.13}} & \speedupnew{25.97} & \multicolumn{1}{c|}{\eval{85.32}{1.11}} & \multicolumn{1}{c|}{\eval{2.30}{0.06}} & \speedupnew{37.04} \\ \hline
+	\code{loopclass500} & \multicolumn{1}{c|}{\eval{1464.87}{9.19}} & \multicolumn{1}{c|}{\eval{40.58}{2.05}} & \speedupnew{36.10} & \multicolumn{1}{c|}{\eval{0.00}{nan}} & \multicolumn{1}{c|}{\eval{0.00}{nan}} & \same{} \\ \hline
+	\end{tabular}
+    \caption{\label{tab:npa} Synthetic class with 0, 20, 50, 100 and 200 nested loops.}
+    
+\end{table}

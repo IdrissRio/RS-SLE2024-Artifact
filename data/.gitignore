@@ -1,0 +1,45 @@
+# Gradle files.
+/.gradle/
+/build/
+
+# Eclipse files.
+/bin/
+/.classpath
+/.project
+/.settings/
+
+# Generated files
+/src/gen/
+/src/gen-res/
+/*.jar
+/*.zip
+
+# Vim swap files.
+*.swp
+
+.DS_Store
+
+*.out
+
+.vscode/
+.VSCodeCounter/
+evaluation/cat/.gradle/
+
+
+.ipynb_checkpoints
+
+evaluation/results/
+
+**/Results.pdf
+**/Results.log
+**/Results.aux
+**/ondemand_analysis_time_vs_methods.png
+**/intraj-table-npa.tex
+**/intraj-table-daa.tex
+evaluation/**/*.class
+./build.gradle
+
+evaluation/cat/build
+evaluation/cat/.gradle
+evaluation/cat/cat.jar
+

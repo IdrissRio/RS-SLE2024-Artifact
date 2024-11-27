@@ -1,0 +1,35 @@
+# build
+/build/
+/.gradle/
+/bin/
+/ant-bin/
+/src/gen/
+/src/gen-res/
+/src/tmp/
+/doc/
+/jastaddj-*.zip
+/jastaddj*.jar
+/fileset.tmp
+/test/
+
+# eclipse
+/.classpath
+/.project
+/.settings/
+
+*.asc
+
+# vim
+*.swp
+
+# temporary files
+/tmp
+/*.jar
+
+# intelliJ
+/.idea/
+/*.iml
+
+/update-version.sh
+
+/NOTES

@@ -1,0 +1,9 @@
+#!/bin/sh
+prefix=/usr/local
+ANTLR_JAR=${prefix}/share/antlr-2.7.2/antlrall.jar
+if test "x$CLASSPATH" = x; then
+	CLASSPATH=$ANTLR_JAR
+else
+	CLASSPATH=$ANTLR_JAR:$CLASSPATH
+fi
+java antlr.Tool $*

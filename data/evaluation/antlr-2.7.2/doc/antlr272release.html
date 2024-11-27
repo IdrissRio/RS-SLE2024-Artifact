@@ -1,0 +1,509 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>ANTLR 2.7.2 Release Notes</title> 
+</head>
+<body bgcolor="#FFFFFF">
+<font size="6" face="Courier New"><strong>ANTLR 2.7.2 Release Notes</strong></font>
+<p>
+	<font face="Arial" size="2"><em>January 19, 2003</em></font>
+</p>
+<p>
+	<font face="Arial"><font size="2">The </font>ANTLR 2.7.2 release is a feature enhancement and bug fix release, partially brought to you by those hip cats at <a href="http://www.jguru.com">jGuru.com</a>.  It has been about 2 years since the last release so expect lots of stuff to have been fixed and improved.</font>
+</p>
+<h3><strong><font face="Arial">Enhancements</font></strong></h3> 
+<p>
+	<font face="Arial">ANTLR 2.7.2 has a few enhancements:</font>
+<ul>
+<li>Added Oliver Zeigermann [oliver@zeigermann.de]'s rudimentary XML lexer (iterates through tags) to examples/java/xml directory.
+
+<li>Added Marco Ladermann [Marco.Ladermann@gmx.de]'s jedit ANTLR mode to extras dir.
+
+<li>ANTLR input itself was restricted previously to latin characters (\3..\177), but I have modified the antlr.g and other grammar files to include \3..\377.  This will allow many Europeans to add accented characters (iso-8859-15 characters) to their ANTLR actions and rule names.
+
+	<li>Added classHeaderPrefix for all grammars.  (replaces "public" and lets user specify)
+<pre>
+class TP extends TreeParser;
+
+options {
+        classHeaderPrefix="public abstract";
+}
+</pre>
+
+<li>
+Brian Smith's fix to MismatchedCharException handles EOF properly.
+I augmented to handle other special char like \n shows up as '\n' now not ' followed by ' on a newline.  Examples:
+<pre>
+$ java Main &lt; /tmp/f
+exception: line 1:7: expecting '
+', found &lt;EOF>
+$ java Main &lt; /tmp/f
+exception: line 1:7: expecting '\n', found &lt;EOF>
+</pre>
+
+<li>Added limited hoisting of predicates for lexer rules with one alternative.  Any predicate on the left edge is hoisted into the nextToken prediction mechanism to gate predicated rules in and out.  Documentation talks about how to match tokens only in column one and other context-sensitive situations.
+
+<li>
+Made $FIRST/$FOLLOW work for action or exception handler.  Arg can be rule name
+<pre>
+a : A {$FIRST(a); $FIRST} B
+  exception
+    catch [MyExc e] {
+        foo = $FOLLOW(a);
+        foo = $FIRST(c);
+    }
+;
+</pre>
+can do $FIRST(a).member(LBRACK) etc...
+
+<li>
+Added AST.getNumberOfChildren() and to BaseAST.  [<b>POSSIBLE INCOMPATIBILITY</b> as you might have implemented AST]
+
+<li>
+added setter/getter for filename in Token
+
+<li>
+sem pred hoisting (limited) for lexer rules
+
+<li>
+ANTLR used to generate a crappy error message:
+<pre>
+warning: found optional path in nextToken()
+</pre>
+when a public lexer rule could be optional such as
+<pre>
+B : ('b')? ;
+</pre>
+I now say:
+<pre>
+warning: public lexical rule B is optional (can match "nothing")
+</pre>
+
+<li>
+For unexpected and no viable alt exceptions, no file/line/column info was generated.
+The exception was wrapped in a TokenStreamRecognitionException that did not delegate error message
+handling (toString()) to the wrapped exception.
+I added a TokenStreamRecognitionException.toString() method so that you now see things like
+<pre>
+<stdin>:1:1: unexpected char: '_'
+</pre>
+instead of
+<pre>
+antlr.TokenStreamRecognitionException: unexpected char: '_'
+</pre>
+
+<li>
+Ric added code to not write output files if they have not changed (Java and C++).
+
+<li>
+Added default tab char handling; defaults to 8.  Added methods to CharScanner:
+<pre>
+    public void setTabSize( int size );
+    public int getTabSize();
+</pre>
+
+<li>
+reformatted all code minus Cpp*.java using Intellij IDEA.
+
+<li>
+Made doEverything return a code instead of System.exit.  made a wrapper
+to do the exit for cmd-line tools.
+
+<li>
+Made antlr use buffered IO for reading grammars; for java grammar went from 11 seconds to 6 seconds.
+
+<li>
+added reset() to ParserSharedInputState and Lexer too.  init of CharQueue
+is now public.
+
+<li>
+   New Makefile setup. Everything can be build from toplevel up.
+     Changes for autoconf enabled make. Added install rules, toplevel
+     configure script.
+<li>
+   Renamed $lookaheadSet to $FOLLOW. Added %FOLLOW to sather mode (hope it
+     works) original patch by Ernest Passour
+<li>
+	Clarified some error/warning messages.
+
+<li>
+   Ported action.g fixes from C++ to Java action.g. Warnings and errors
+     in actions are now correctly reported in java mode as well.
+<li>
+   Added reset methods to the Queue type objects (java/C++).
+<li>
+   Added reset methods to the Input/TokenBuffer objects (java/C++).
+<li>
+   Added reset methods to the SharedInputState objects (java/C++).
+<li>
+   Added -h/-help/--help options. Adapted the year range in the copyright in
+     the help message.
+<li>
+   Allow whitespace between $setxxx and following '('.
+<li>
+   Give errors when target file/directory not writeable.
+
+<li>
+   Changed the position of the init actions for
+	  (..)* (..)+ to just inside the loop handling the closure. This way we
+	  can check EOF conditions in the init action for each loop invocation. And
+	  generate much better error messages. [<b>POSSIBLE INCOMPATIBILITY</b>]
+</ul>
+
+<h3><font face="Arial"><strong>Java Code Generation</strong></font></h3> 
+<p>
+
+<ul>
+<li>Updated ASTFactory mechanism and heterogeneous tree construction.
+
+	<ul>
+	<li>You can tell the ASTFactory how to map token type to Java AST class to create:
+<pre>
+	/** Specify an "override" for the Java AST object created for a	 *  specific token.  It is provided as a convenience so	 *  you can specify node types dynamically.  ANTLR sets	 *  the token type mapping automatically from the tokens{...}	 *  section, but you can change that mapping with this method.	 *  ANTLR does it's best to statically determine the node	 *  type for generating parsers, but it cannot deal with	 *  dynamic values like #[LT(1)].  In this case, it relies	 *  on the mapping.  Beware differences in the tokens{...}	 *  section and what you set via this method.  Make sure	 *  they are the same.	 *	 *  Set className to null to remove the mapping.	 *	 *  @since 2.7.2	 */	public void setTokenTypeASTNodeType(int tokenType, String className)</pre>
+
+	<li>You must use the fully qualified classname when specifying what kind of Java object to create from Token objects [<b>POSSIBLE INCOMPATIBILITY</b>].
+   
+	<li>Enhanced ASTFactory to have ctor for token type to AST node type map.
+Modified generated parser to have the hashtable setup method and added this Parser.java
+method so you 
+can create your own ASTFactory with the generated map:
+<pre>
+	/** If the user specifies a tokens{} section with heterogeneous
+	 *  AST node types, then ANTLR generates code to fill
+	 *  this mapping.
+	 */
+	public Hashtable getTokenTypeToASTClassMap() {
+		return tokenTypeToASTClassMap;
+	}
+</pre>
+and in the <b>generated</b> ctors if buildAST:
+<pre>
+	buildTokenTypeASTClassMap();
+	astFactory = new ASTFactory(getTokenTypeToASTClassMap());
+</pre>
+Here is the build method form:
+<pre>
+        protected void buildTokenTypeASTClassMap() {
+                tokenTypeToASTClassMap = new Hashtable();
+                tokenTypeToASTClassMap.put(new Integer(ID), IDNode.class);
+				...
+        };
+</pre>
+
+	<li>dup(AST t) now mimics the node type.
+
+	<li>Hetero tree construction changed to call factory:
+<pre>
+PLUSNode tmp1_AST = null;
+tmp1_AST = new PLUSNode(LT(1));
+</pre>
+
+to
+<pre>
+PLUSNode tmp1_AST = null;
+tmp1_AST = (PLUSNode)astFactory.create(LT(1),"PLUSNode");
+</pre>
+
+For the TreeParser node construction: I left it alone as you can get the AST factory out of the parser and set in the TreeParser manually upon creation.  I don't want duplicate-possibly-slightly-different copies of the mapping running around.
+
+	<li>Added TestASTFactory in ASTSupport dir of examples.
+	</ul>
+
+<li>
+I removed a bunch of unnecessary AST casts in front of .create(...) calls.
+
+<li>
+Added brian smith's netbeans changes that make ANTLR easier to integrate into other tools.
+
+<li>
+Integrated jguru fixes for java.g and java.tree.g that improve recognition and tree structure.
+
+<li>
+1) optimized large bitset initialization code for the lexer.  Dropped JavaLexer.class
+from 87k to 25k.  Runs of integers are written via loops instead of big static arrays which annoyed lots of classloaders.  Bryan O'Sullivan submitted solution.  Example:
+<pre>
+
+   private static final long[] mk_tokenSet_1() {
+         long[] data = new long[8];
+         data[0]=-576460752303432712L;
+         for (int i = 1; i<=3; i++) { data[i]=-1L; }
+         return data;
+     }
+</pre>
+
+<li>Reinstated fileline formatter code that got dropped in exception rework.
+<li>Added column information to FileLineFormatter. Changed stuff all over the
+     place to support it.
+<li>Added ASTPair construction optimization suggested by Sander Magi.
+
+</ul>
+
+<h3><font face="Arial"><strong>C++ Code Generation</strong></font></h3> 
+<p>
+<ul>
+
+<li>Mirrored tabsize handling from java.
+<li>README updates
+<li>Configure/Makefile changes from David Scott Page
+  distclean targets + general cleanups etc... (see his mail)
+<li>Removed sstream dependencies from ASTFactory
+<li>Ported change 625 to C++ mode. (currentAST bug)
+<li>Fixed a Makefile for sather removal.
+<li>Fixed:In the command-line options, the docs say to use "-traceTreeWalker".  
+Alas, the code insists that you use "-traceTreeParser".  That was 
+annoying to figure out.  :)
+
+
+   <li>Tested with 'Sun WorkShop 6 2000/08/30 C++ 5.1 Patch 109490-01'. A few
+     small fixes.
+   <li>Verified build with gcc 2.8.1 and gcc 2.95.3.
+   <li>Fixed typo in config.hpp added fixes for 2.8.1.
+   <li>Dropped dependency on sstream from ASTFactory
+   <li>Misc fixes for 2.8.1
+   <li>Added config for Digital Tru64 C++ compiler. (courtesy Andre Moll)
+   <li>MetroWerks Codewarrior fixes from Ruslan Zasukhin.
+   <li>Define ANTLR_CCTYPE_NEEDS_STD if isprint needs std:: (RZ)
+   <li>Define ANTLR_CXX_SUPPORTS_UNCAUGHT_EXCEPTION if std::uncaught_exception
+     is supported by compiler. (RZ)
+   <li>Made XML support configurable with ANTLR_SUPPORT_XML define. (RZ)
+   <li>Moved some methods back to header for better inlining. (RZ)
+	<li>Added getASTFactory to treeparser. Marked setASTNodeFactory as
+	  deprecated, added setASTFactory to Parser (improve consistency).
+   <li>Removed down and right initializers from BaseAST copy constructor, they
+     wreak havoc in relation to dupTree. (forgot who reported this)
+   <li>Added missing initializer for factory in TreeParser constructor.
+   <li>Added the possiblity to escape # characters. Added more preprocessor stuff
+     to be skipped. Changed error for ## into a warning.
+   <li>Some heterogeneous AST fixes.
+   <li>Made optimization of AST declarations constructions a little bit less
+     aggressive.
+   <li>Tightened up the generation of declarations for AST's.
+   <li>Updated a lot of #include "antlr/xx" to #include <antlr/xx>. Also
+   <li>Small addition for MSVC. (Jean-Daniel Fekete)
+   <li>Fixed missing 0 check in astfactory code.
+   <li>Also preprocess preheader actions and preambles for treegeneration code.
+   <li>Added to the C++ LexerSharedInputState an initialize function that
+     reinitializes the thing with a new stream.
+   <li>Bugfix: Initialized attribute filename a little bit earlier so error
+	  message shows the filename in stead of 'null'.
+   <li>tokenNames vector is now a simple array not a vector.
+   <li>Optimizations in Tracer classes (dumped string's). Removed setTokenNames
+     from the support library. Switched tokenNames to use a char* array.
+   <li>Generate NUM_TOKENS attribute in parsers. Added getNumTokens methods to
+     parsers.
+	<li>Changes in MismatchedTokenException to reflect the previous.
+   <li>More fixes for XML I/O (xml-ish actually). It's a bit tidier now. Some
+	  too advanced things removed (ios_base::failure). Embedding custom XML
+	  elements in the stream should be possible now.
+   <li>Bugfix: in case of a certain order of header actions (pre_include_xx etc.)
+     one header action might overwrite another. Probably only affects C++.
+   <li>Fix from Emir Uner for KAI C++ cast string literal to 'const
+     char*' for make_pair.
+   <li>Improved exception handling in trace routines of parser. Patch submitted
+     by John Fremlin. Tracer class now catch exceptions from lexer. Fixed
+     forgotten message in BitSet.cpp.
+   <li>Added implementations for getLAChars and getMarkedChars.
+
+</ul>
+
+<h3><font face="Arial"><strong>C# Code Generation</strong></font></h3> 
+<p>
+C# code generation added by Micheal Jordan, Kunle Odutola and Anthony
+Oguntimehin
+
+<ul>
+	<li>Based initial C# generator and runtime model on Java to aid code reuse/portability</li>
+	<li>Added support for specifying an enclosing C# namespace for generated lexers/parsers/treeparsers</li>
+	<li>Patch from Scott Ellis to optimize _saveIndex variable creation (eliminates related unused-varaible warnings) </li>
+	<li>Incorporated Richard Ney's fixes for case-sensitive literals handling, TreeParser token-types classname and "unreachable code" warnings</li>
+	<li>Added code to support better handling of C# preprocessor directives in action blocks</li>
+	<li>Extensive reamp of heterogenous AST handling to match description in manual</li>
+	<li>Added initializeASTFactory(ASTFactory f) method to generated Parsers to facilitate flexible TreeParser factory initialization</li>
+	<li>Changed a few more member names in the ongoing quest for full CLS-compliance for the ANTLR C# runtime assembly - xx_tokenSet_xx</li>
+	<li>Generated C# lexers/parsers/treeparsers now support tracing if built with the -traceXXXX options</li>
+	<li>BREAKING CHANGE: initializeASTFactory(ASTFactory f)  is now a static member</li>
+	<li>ANTLR C# now includes more than twice as many examples as during the alpha/beta programmes - all examples supplied with build-and-run NAnt build 	<li>ASTFactory.dup(AST t) doesn't use object.Clone() and copy constructors any more. It now uses reflection and interrogate the parameter instance and create a new instance of it's type.</li>
+	<li>Support for heterogenous AST greatly improved after receiving detailed bug reports and repro-grammars from Daniel Gackle on the ANTLR list.</li>
+</ul>
+
+<h3><font face="Arial"><strong>Bug Fixes</strong></font></h3> 
+<p>
+<ul>
+<li>
+Removed imports from default package in Main.java examples.
+
+<li>Fixed k=0 value causing exception.
+
+<li>Ambig refs to ast variables caused a NullPointerException. Now it says:
+
+class ErrorMaker extends TreeParser;
+
+root
+  : #( WHATEVER SEMI {echo(#SEMI); } SEMI {echo(#SEMI); } )
+  ;
+
+error: Ambiguous reference to AST element SEMI in rule root
+
+Thanks to "Oleg Pavliv" <opavliv@lysis.com>
+
+<li>From: steve hurt <steven.f.hurt@lmco.com>
+The second bug occurs when a user wants to
+organize a suite of grammar files into seperate
+directories. Due to a bug in the
+tool it incorrectly forms the location of the
+import/export vocabulary files. added a trim() to remove extra space.
+
+<li> "Silvain Piree" <s.piree@enneya.com> gave me versions of Grammar*.java in preproc that used stringbuffers...much faster for inherited grammars.
+
+<li>"Lloyd Dupont" <lloyd@galador.net>
+java grammar: Was 0..9 not 0..7 in ESC when starting with 4..7
+     assumed float not double; 3.0 was seen as float
+
+ <li>     John Pybus                      john@pybus.org
+sent in a major fix to handle f.g.super(); required rewrite of primary/postfix expression rules.
+
+<li>put an "if GENAST" gate around import statements for AST types
+    in normal non-tree parsers.
+
+
+<li>Thanks to Marco van Meegen <Marco.van.Meegen@t-online.de>
+for his suggestion/help getting ANTLR
+into shape for inclusion into eclipse IDE.  I took his suggestion and
+make the antlr.Tool object a simple variable reference so that multiple
+kinds of Tool objects (such as one hooked into Eclipse) could be used
+with ANTLR.  This required simple changes but over *many* files!
+
+<li>removed Sather support at the request of the supporter.
+
+
+<li>add warning/error.  Bad code gen with ^ or ! on tree root
+when building trees in a tree walker grammar such as:
+
+expr:   #(PLUS^ expr expr)  
+    |   i:INT
+    ;
+
+Fortunately, ^ is simply redundant; removing it makes code ok.
+Added a warning.  Added an error message for ! saying that it
+is not implemented.
+
+<li>bug fix: incorrect code generation for #(. BLORT) in
+tree walker grammar.  Didn't properly handle the wildcard
+root (missing _t==null check).
+
+<li>bug fix.  The lexer generator puts this assignment _after_ inserting
+everything into the literals table: caseSensitiveLiterals = false; 
+
+Of course it needs to be before since ANTLRHashString depends on
+it to calculate the hashCode.  Not sure when this got fixed actually.
+
+<li>Code gen bug fix: "if true {" could be generated sometimes in
+the Lexer.  I put (...) around an isolated true if it's generated
+from JavaCodeGenerator.getLookaheadTestExpression.
+
+<li>For large numbers of alternatives (>126) combined with syntactic predicates, there was a problem
+whereby the syn pred testing code was not there.  2.7.1 introduced this problem. 2.7.2 has it right again.
+
+<li>Removed syn pred testing gates on ast construction code; returnAST is ignored while in
+try block while guessing.  So, the tree construction in an invoked rule while guessing has no effect.
+No need to test.
+
+<li>Char ranges with ! on the alternative or range itself did not have the code necessary to delete the matched character from the token text.
+
+<li>moved strip*(...) methods from Tool to StringUtils; updated mkjar accordingly.
+
+<li>bug fix: a #(pippo) construct, which isn't allowed, caused a nullptr exception with kaffe.
+It shouldn't get an exception.  It now shows: "unexpected token: pippo" instead.
+
+<li>a double ;; in antlr.g action and some stray semis were causing kjc to puke.
+
+<li>the constructors of antlr/CharQueue.java and antlr/TokenQueue.java didn't check
+for int overflow. They try to set queue size to the next higher multiple 
+
+of 2, which is not possible for all inputs (Integer.MAX_VALUE == 2^15-1). The 
+
+constructor loops forever for some inputs.  Checked for huge size requests.
+
+
+
+<li>The CharScanner.rewind(int) method did not rewind the column, just the input state. oops.
+    It now reads:
+    public void rewind(int pos) {
+        inputState.input.rewind(pos);
+        setColumn(inputState.tokenStartColumn); // ADDED
+    }
+
+   <li>Added warnings for labeled subrules.
+
+   <li>Robustified action.g - if currentRule = 0 a fitting error message is
+     printed.
+</ul>
+
+<h3><font face="Arial"><strong>ANTLR Installation</strong></font></h3> 
+<p>
+	<font face="Arial">ANTLR comes as a single zip or compressed tar file. Unzipping the file you receive will produce a directory called <tt>antlr-2.7.2</tt> with subdirectories <tt>antlr</tt>, <tt>doc</tt>, <tt>examples</tt>, cpp, and examples.cpp. You need to place the <tt>antlr-2.7.2</tt> directory in your <tt>CLASSPATH</tt> environment variable. For example, if you placed <tt>antlr-2.7.2</tt> in directory <tt>/tools</tt>, you need to append </font>
+</p>
+<blockquote>
+	<p>
+		<font face="Arial"><tt>/tools/antlr-2.7.2</tt> </font>
+	</p>
+</blockquote>
+<p>
+	<font face="Arial">to your <tt>CLASSPATH</tt> or. </font>
+</p>
+<blockquote>
+	<p>
+		<font face="Arial"><tt>\tools\antlr-2.7.2</tt></font>
+	</p>
+</blockquote>
+<p>
+	<font face="Arial">if you work on Windoze.</font>
+</p>
+<p>
+	<font face="Arial">References to <tt>antlr.*</tt> will map to <tt>/tools/antlr-2.7.2/antlr/*.class</tt>.</font>
+</p>
+<p>
+	<font face="Arial">You must have at least JDK 1.1 installed properly on your machine.&nbsp; The ASTFrame AST viewer uses Swing 1.1.</font>
+</p>
+<h4><font face="Arial"><strong>JAR FILE</strong></font></h4> 
+<p>
+	<font face="Arial">Try using the <strong>runtime</strong> library </font><font face="Courier New">antlr.jar</font><font face="Arial"> file. Place it in your CLASSPATH instead of the antlr-2.7.2 directory. The jar includes all <strong>parse-time</strong> files needed (this jar includes every .class file associated with ANTLR) You can run the antlr tool itself with the jar and your parsers. </font>
+</p>
+<h4><font face="Arial"><strong>RUNNING ANTLR</strong></font></h4> 
+<p>
+	<font face="Arial">ANTLR is a command line tool (although many development environments let you run ANTLR on grammar files from within the environment). The main method within antlr.Tool is the ANTLR entry point.</font>
+</p>
+<blockquote>
+	<p>
+		<font face="Arial"><tt>java antlr.Tool file.g</tt> </font>
+	</p>
+</blockquote>
+<p>
+	<font face="Arial">The command-line option is -diagnostic, which generates a text file for each output parser class that describes the lookahead sets. Note that there are number of options that you can specify at the grammar class and rule level.</font>
+</p>
+
+<p>
+Here are the command line arguments:
+<tt><pre>
+ANTLR Parser Generator   Version 2.7.2rc1 (20021221)   1989-2002 jGuru.com
+usage: java antlr.Tool [args] file.g
+  -o outputDir       specify output directory where all output generated.
+  -glib superGrammar specify location of supergrammar file.
+  -debug             launch the ParseView debugger upon parser invocation.
+  -html              generate a html file from your grammar.
+  -docbook           generate a docbook sgml file from your grammar.
+  -diagnostic        generate a textfile with diagnostics.
+  -trace             have all rules call traceIn/traceOut.
+  -traceLexer        have lexer rules call traceIn/traceOut.
+  -traceParser       have parser rules call traceIn/traceOut.
+  -traceTreeParser   have tree parser rules call traceIn/traceOut.
+  -h|-help|--help    this message
+</pre></tt>
+
+<p>
+	<font face="Arial">If you have trouble running ANTLR, ensure that you have Java installed correctly and then ensure that you have the appropriate <tt>CLASSPATH</tt> set.</font>
+</p>
+
+</body>
+</html>
