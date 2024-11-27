@@ -1,4 +1,9 @@
 # Artifact Evaluation: Efficient Demand Evaluation of Fixed-Point Attributes Using Static Analysis
+<p float="left" align="center">
+<a href="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_functional_v1_1.pngl">
+  <img  width="100"  src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_evaluated_functional_v1_1.png"> </a>
+  <a href="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_available_v1_1.png"><img width="100"  src="https://www.acm.org/binaries/content/gallery/acm/publications/artifact-review-v1_1-badges/artifacts_available_v1_1.png"> </a>
+</p>
 
 **Authors:**
 - Idriss Riouak (idriss.riouak@cs.lth.se), Lund University, Sweden
@@ -8,6 +13,11 @@
 - Christoph Reichenbach (christoph.reichenbach@cs.lth.se), Lund University, Sweden
 
 **DOI**: [10.5281/zenodo.13365896](https://doi.org/10.5281/zenodo.13365896)
+**Link to the Paper**: [Efficient Demand Evaluation of Fixed-Point Attributes Using Static Analysis](https://dl.acm.org/doi/10.1145/3687997.3695644)
+
+
+
+
 
 ## Overview
 
@@ -409,3 +419,11 @@ The output should be similar to the following:
 You can now visit [http://localhost:8080/index.html](http://localhost:8080/index.html) to visualise the callgraph of *IntraJ* and *ExtendJ*.
 
 ![Callgraph of *IntraJ* with the `Cose` layout](imgs/intraj.png)
+
+
+#### Distinguished Artifact Award
+The artifact has been evaluated by the Artifact Evaluation Committee and has been awarded the Distinguished Artifact Award.
+
+<p float="left" align="center">
+  <img    src="imgs/distinguished.png">
+</p>
